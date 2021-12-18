@@ -1,3 +1,7 @@
+import typing as t
+from copy import deepcopy
+from operator import add, mul
+
 from .types import Json
 
 WHITELIST = {
@@ -24,6 +28,25 @@ WHITELIST = {
 }
 
 
+def relative(src: Json, key: str, op: t.Callable[[t.Any, t.Any], t.Any]):
+    if src.get(key):
+        for k, v in src[key].items():
+            if isinstance(v, float) or isinstance(v, int):
+                src[k] = op(src[k], v)
+            elif isinstance(v, dict):
+                # 嵌套情况
+                for _k, _v in v.items():
+                    if isinstance(_v, float) or isinstance(_v, int):
+                        src[k][_k] = op(src[k][_k], _v)
+                    elif isinstance(_v, str):
+                        pass
+                    else:
+                        raise TypeError(f"Unknown Type：{type(_v)}")
+            else:
+                raise TypeError("Unknown Type！")
+        del src[key]
+
+
 def expand(src: Json, dst: Json) -> bool:
     """
     处理 JSON 继承关系，规则见：
@@ -45,32 +68,14 @@ def expand(src: Json, dst: Json) -> bool:
     # 处理 copy-from
     for k, v in dst.items():
         if not src.get(k):
-            src[k] = v
+            src[k] = deepcopy(v)
     del src["copy-from"]
 
     # 处理 relative
-    if src.get("relative"):
-        for k, v in src["relative"].items():
-            if isinstance(v, float) or isinstance(v, int):
-                src[k] += v
-            elif isinstance(v, dict):
-                # 嵌套情况
-                for _k, _v in v.items():
-                    if isinstance(_v, float) or isinstance(_v, int):
-                        src[k][_k] += _v
-                    elif isinstance(_v, str):
-                        pass
-                    else:
-                        raise TypeError(f"Unknown Type：{type(_v)}")
-            else:
-                raise TypeError("Unknown Type！")
-        del src["relative"]
+    relative(src, "relative", add)
 
     # 处理 proportional
-    if src.get("proportional"):
-        for k, v in src["proportional"].items():
-            src[k] *= v
-        del src["proportional"]
+    relative(src, "proportional", mul)
 
     # 处理 extend
     if src.get("extend"):

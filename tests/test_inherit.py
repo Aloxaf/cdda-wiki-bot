@@ -1,6 +1,8 @@
 import json
+from pprint import pprint
 
-from cwbot import inheritance
+from cwbot import inherit
+from cwbot.types import Json
 
 ITEM_223 = """
 {
@@ -48,28 +50,35 @@ ITEM_reloaded_556 = """
     "copy-from": "556",
     "type": "AMMO",
     "name": "reloaded 5.56 NATO",
-    "proportional": {
-        "damage": 0.9,
-        "dispersion": 1.1
-    },
+    "proportional": { "price": 0.7, "damage": { "damage_type": "bullet", "amount": 0.9 }, "dispersion": 1.1 },
     "extend": { "effects": [ "RECYCLED" ] },
     "delete": { "effects": [ "NEVER_MISFIRES" ] }
 }
 """
-ITEM_556 = json.loads(ITEM_556)
-ITEM_223 = json.loads(ITEM_223)
-ITEM_reloaded_556 = json.loads(ITEM_reloaded_556)
+ITEM_556: Json = json.loads(ITEM_556)
+ITEM_223: Json = json.loads(ITEM_223)
+ITEM_reloaded_556: Json = json.loads(ITEM_reloaded_556)
 
 
 def test_inheritance():
-    result = inheritance.expand(ITEM_reloaded_556, ITEM_556)
+    result = inherit.expand(ITEM_reloaded_556, ITEM_556)
     assert result is False
 
-    result = inheritance.expand(ITEM_556, ITEM_223)
+    result = inherit.expand(ITEM_556, ITEM_223)
     assert result is True
 
+    # copy
     assert ITEM_556["count"] == ITEM_223["count"]
+    # relative
     assert ITEM_556["damage"]["amount"] == ITEM_223["damage"]["amount"] - 3
+    # proportional
     assert ITEM_556["recoil"] == ITEM_223["recoil"] * 1.1
+    # extend
+    assert "NEVER_MISFIRES" in ITEM_556["effects"]
+    # delete
 
-    print(ITEM_556)
+    result = inherit.expand(ITEM_reloaded_556, ITEM_556)
+    assert result is True
+    assert "NEVER_MISFIRES" not in ITEM_reloaded_556["effects"]
+
+    pprint(ITEM_556)
