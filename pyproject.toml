@@ -1,0 +1,31 @@
+[project]
+name = "cwbot"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Aloxaf", email = "Aloxafx@gmail.com"},
+]
+dependencies = [
+    "pywikibot",
+    "loguru",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[project.urls]
+homepage = ""
+
+[project.scripts]
+cwbot = "cwbot.__main__:main"
+
+[project.optional-dependencies]
+[tool]
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest",
+]
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
