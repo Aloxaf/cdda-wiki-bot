@@ -1,0 +1,12 @@
+[website]
+host = "cdda-wiki.aloxaf.cn"
+path = "/"
+username = "USERNAME"
+password = "PASSWORD"
+
+[cdda]
+repo_dir = "/somewhere/Cataclysm-DDA"
+task_type = [
+    "SPELL"
+    "mutation",
+]

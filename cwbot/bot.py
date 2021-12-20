@@ -89,3 +89,14 @@ class WikiBot:
                 self.update_page(name, text)
 
             self.create_redirect(data["id"], name)
+
+    def update_books(self, datas: t.List[Json], mod_name: t.Optional[str] = None):
+        """
+        更新书籍页面
+        :param datas:
+        :param mod_name:
+        :return:
+        """
+        for data in datas:
+            if data.get("id") == "manual_swordsmanship":
+                print(data)

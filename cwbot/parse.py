@@ -99,12 +99,12 @@ class Mod:
 
 
 class CddaJsonParser:
-    def __init__(self, cdda_path: str):
+    def __init__(self, repo_dir: str):
         """
         初始化解析器
-        :param cdda_path: CDDA 文件夹的位置
+        :param repo_dir: CDDA 文件夹的位置
         """
-        self.data_dir = Path(cdda_path) / "data"
+        self.data_dir = Path(repo_dir) / "data"
         self.mods: t.Dict[str, Mod] = dict()
 
     def parse_all(self):

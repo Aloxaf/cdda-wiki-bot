@@ -6,7 +6,7 @@ from pathlib import Path
 ZH_CN: t.Optional[gettext.GNUTranslations] = None
 TRANS = {}
 
-Entry = t.Dict[str, t.Union[str, float, int, dict, list]]
+Entry = t.Dict[str, str | float | int | dict | list]
 
 
 def npgettext(context, single, plural):
@@ -44,13 +44,15 @@ def extract(data: Entry):
         TRANS[mid] = npgettext(None, name, None)
 
 
-def init(data_dir: str, localedir: str):
+def init(repo_dir: str):
     """
     初始化翻译
-    :param data_dir: data 文件夹所在位置
-    :param localedir: .mo 文件所在位置
+    :param repo_dir: cdda repo 位置
     :return:
     """
+    data_dir = Path(repo_dir) / "data"
+    localedir = Path(repo_dir) / "lang/mo"
+
     global ZH_CN
     ZH_CN = gettext.translation("cataclysm-dda", localedir=localedir, languages=["zh_CN"])
     ZH_CN.install()

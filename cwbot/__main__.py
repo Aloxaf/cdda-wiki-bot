@@ -1,34 +1,34 @@
-from sys import argv
-
+from . import config
 from . import trans
 from .parse import CddaJsonParser
-from .wiki import WikiBot
+from .bot import WikiBot
 
 
 def main():
-    if len(argv) != 2:
-        print(f"Usage: {argv[0]} CDDA_PATH")
-        exit()
-
-    parser = CddaJsonParser(argv[1])
+    parser = CddaJsonParser(config.cdda.repo_dir)
     parser.parse_all()
     parser.expand_inherit()
 
-    trans.init(argv[1] + "/data", argv[1] + "/lang/mo")
+    trans.init(config.cdda.repo_dir)
 
     bot = WikiBot(
-        "cdda-wiki.aloxaf.cn",
-        path="/",
-        username="AutoUpdateBot",
-        password="u3a5vrar77qv8ci99fq7ocbb7flmrv9f",
+        config.website.host,
+        path=config.website.path,
+        username=config.website.username,
+        password=config.website.password,
     )
 
-    for mod, data in parser.mods.items():
-        spells = data.get_type("SPELL")
-        mod_name = data.name
-        if mod == "dda":
-            mod_name = None
-        bot.update_spells(spells, mod_name)
+    for mod_id, mod in parser.mods.items():
+        for task_type in config.cdda.task_type:
+            data = mod.get_type(task_type)
+            mod_name = mod.name
+            if mod_id == "dda":
+                mod_name = None
+            match task_type:
+                case "SPELL":
+                    bot.update_spells(data, mod_name)
+                case "BOOK":
+                    bot.update_books(data, mod_name)
 
 
 if __name__ == "__main__":
