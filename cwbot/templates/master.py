@@ -2,6 +2,7 @@ import typing as t
 from collections import defaultdict
 
 from ..types import Json
+from ..trans import trans as tr
 
 TEMPLATE = """{{{{Navbox
 |name       = 法术体系
@@ -19,8 +20,8 @@ TEMPLATE = """{{{{Navbox
 </noinclude>"""
 
 
-def tr(text: str) -> str:
-    return "{{tr|" + text + "}}"
+def sort_by_spell_class(d: Json) -> str:
+    return tr(d.get("spell_class", ""))
 
 
 def template(datas: t.List[Json]) -> str:
@@ -30,13 +31,14 @@ def template(datas: t.List[Json]) -> str:
     :return: 「模板:法术体系」页面的内容
     """
     master = defaultdict(list)
-    for data in datas:
+    for data in sorted(datas, key=sort_by_spell_class):
         if not data.get("id"):
             continue
 
-        spell_class = data.get("spell_class")
-        if not spell_class:
+        spell_class = data.get("spell_class", "NONE")
+        if spell_class == "NONE":
             continue
+
         master[spell_class].append(data["id"])
 
     fields = []

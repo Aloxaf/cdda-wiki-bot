@@ -1,6 +1,5 @@
 import typing as t
 import re
-from collections import defaultdict
 
 import mwclient
 from loguru import logger
@@ -65,25 +64,26 @@ class WikiBot:
         if not page.exists:
             page.edit(f'#REDIRECT [[{dst}]]', summary="cdda wiki bot 自动更新")
 
-    def update_spells(self, datas: t.List[Json]):
+    def update_spells(self, datas: t.List[Json], mod_name: t.Optional[str] = None):
         """
-        更新法术页面
+        更新法术页面，并为大魔法创建「模板:法术体系」
         :param datas: 法术的 JSON 数据
+        :param mod_name: MOD 名称
         :return:
         """
-        # 先扫描一遍生成「模板:法师列表」
-        master_template = master.template(datas)
-
-        self.update_page("模板:法术体系", master_template)
+        if mod_name == "大魔法":
+            # 先扫描一遍生成「模板:法术体系」
+            master_template = master.template(datas)
+            self.update_page("模板:法术体系", master_template)
 
         for data in datas:
             if not data.get("id"):
                 logger.warning("这个法术没有 ID: {}", data)
                 continue
 
-            name, text = spell.template(data)
+            name, text = spell.template(data, mod_name)
 
-            if data.get("spell_class"):
+            if mod_name == "大魔法" and data.get("spell_class", "NONE") != "NONE":
                 self.update_page(name, text, footer="{{模板:法术体系}}")
             else:
                 self.update_page(name, text)
