@@ -10,8 +10,8 @@ TEMPLATE = """{{{{Navbox
 |state      = uncollapsed <!-- leave blank to autocollapse -->
 
 |bodystyle = background:#fdfdfd; width:100%; vertical-align:middle; border-color: #1a9c9c;
-|titlestyle = background:#BA55D3; color:#006600; padding-left:0.3em; padding-right:0.3em; text-align:center;
-|groupstyle = background:#BA55D3; color:#006600; padding-left:1em; padding-right:1em; text-align:right; font-weight: bold;
+|titlestyle = background:#E27FFA; color:#006600; padding-left:0.3em; padding-right:0.3em; text-align:center;
+|groupstyle = background:#E27FFA; color:#006600; padding-left:1em; padding-right:1em; text-align:right; font-weight: bold;
 
 {text}
 

@@ -23,20 +23,16 @@ def template(data: Json, mod_name: t.Optional[str] = None) -> t.Tuple[str, str]:
     fields = []
     for k, v in data.items():
         if k == "extra_effects":
-            v = [f"[[{tr(i['id'])}]]" for i in v]
-        if k == "effect":
-            v = f"[[法术效果#{v}|{v}]]"
-        if k == "flags":
-            v = [f"[[FLAGS:法术#{i}|{i}]]" for i in v]
-        if k == "valid_targets":
-            v = [f"[[施法目标#{i}|{i}]]" for i in v]
-        if k == "affected_body_parts":
-            v = [f"[[{tr(i)}]]" for i in v]
+            v = [i['id'] for i in v]
+        if k == "learn_spells":
+            v = [f"{spell},{level}" for spell, level in v.items()]
         if isinstance(v, list):
             if isinstance(v[0], str):
-                v = ", ".join(v)
+                v = " ".join(v)
             else:
-                raise Exception(k, v)
+                raise Exception(data['id'], k, v)
+        if isinstance(v, dict):
+            raise Exception(data['id'], k, v)
         fields.append(f"|{k}={v}")
     mod_str = f"|mod_name={mod_name}\n" if mod_name else ""
     return name, "<noinclude>{{Spell</noinclude>\n" + mod_str + "\n".join(fields) + "\n}}\n"

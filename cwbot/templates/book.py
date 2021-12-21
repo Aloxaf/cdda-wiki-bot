@@ -26,6 +26,8 @@ def template(data: Json, mod_name: t.Optional[str] = None) -> t.Tuple[str, str]:
             return "", ""
         if k == "proficiencies":
             v = [i["proficiency"] for i in v]
+        if k == "description":
+            v = v["str"]
         if isinstance(v, list):
             if len(v) == 0:
                 continue
