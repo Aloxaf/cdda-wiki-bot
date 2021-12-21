@@ -4,7 +4,7 @@ import re
 import mwclient
 from loguru import logger
 from .types import Json
-from .templates import spell, master
+from .templates import spell, master, book
 
 TEMPLATE_HEADER = """<!-- CDDA WIKI BOT START -->
 <!-- 这部分内容是 bot 生成的，请不要更改 -->
@@ -93,10 +93,18 @@ class WikiBot:
     def update_books(self, datas: t.List[Json], mod_name: t.Optional[str] = None):
         """
         更新书籍页面
-        :param datas:
-        :param mod_name:
+        :param datas: 书籍的 JSON 数据
+        :param mod_name: MOD 名称
         :return:
         """
         for data in datas:
-            if data.get("id") == "manual_swordsmanship":
-                print(data)
+            if not data.get("id"):
+                logger.warning("跳过无 ID 物品: {}", data)
+                continue
+
+            name, text = book.template(data, mod_name)
+            if not name:
+                continue
+
+            self.update_page(name, text)
+            self.create_redirect(data["id"], name)
