@@ -2,7 +2,7 @@ import typing as t
 from copy import deepcopy
 
 from loguru import logger
-from .utils import get_name
+from . import utils
 from ..types import Json
 
 
@@ -15,24 +15,42 @@ def template(data: Json, mod_name: t.Optional[str] = None) -> t.Tuple[str, str]:
     """
     data = deepcopy(data)
 
-    name = get_name(data)
+    name = utils.get_name(data)
     data["name"] = name
 
     # 生成模板
     fields = []
     for k, v in data.items():
-        if k == "snippet_category":
-            logger.warning("Skip snippet_category")
-            return "", ""
-        if k == "proficiencies":
-            v = [i["proficiency"] for i in v]
-        if k == "description":
-            v = v["str"]
+        match k:
+            case "//":
+                continue
+            case "weight":
+                v = utils.normalize_weight(v)
+            case "volume":
+                v = utils.normalize_volume(v)
+            case "time":
+                v = utils.normalize_time(v)
+            case "price" | "price_postapoc":
+                v = utils.normalize_price(v)
+            case "snippet_category":
+                logger.warning("Skip snippet_category")
+                return "", ""
+            case "proficiencies":
+                v = [i["proficiency"] for i in v]
+            case "description" if isinstance(v, dict):
+                v = v["str"]
+            case "use_action" if isinstance(v, dict):
+                if v["type"] == "learn_spell":
+                    k = "learn_spell"
+                    v = v["spells"]
+                else:
+                    raise Exception(data["id"], k, v)
+
         if isinstance(v, list):
             if len(v) == 0:
                 continue
             if isinstance(v[0], str):
-                v = "  ".join(v)
+                v = " ".join(v)
             else:
                 raise Exception(data["id"], k, v)
         fields.append(f"|{k}={v}")

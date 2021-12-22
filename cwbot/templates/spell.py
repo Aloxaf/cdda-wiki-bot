@@ -22,6 +22,8 @@ def template(data: Json, mod_name: t.Optional[str] = None) -> t.Tuple[str, str]:
     # 生成模板
     fields = []
     for k, v in data.items():
+        if k == "//":
+            continue
         if k == "extra_effects":
             v = [i['id'] for i in v]
         if k == "learn_spells":
