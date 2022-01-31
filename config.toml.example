@@ -1,5 +1,5 @@
 [website]
-host = "cdda-wiki.aloxaf.cn"
+host = "cdda-wiki.aloxaf.com"
 path = "/"
 username = "USERNAME"
 password = "PASSWORD"
